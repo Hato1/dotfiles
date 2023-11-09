@@ -1,0 +1,31 @@
+{
+	"color_scheme": "Monokai.sublime-color-scheme",
+	"font_size": 13,
+	"open_files_in_new_window": "always",
+	"close_windows_when_empty": true,
+	"spell_check": true,
+	"dictionary": "Packages/Language - English/en_GB.dic",
+	"theme": "auto",
+	"rulers": [79, 89],
+	"remember_workspace": true,
+	"file_exclude_patterns": 
+	[
+		"*.pyc",
+		"*.obj",
+		"*.o",
+		"__pycache__",
+		"*.a",
+		"*.lib",
+		"*.so",
+		".DS_Store",
+		"*.sublime-workspace",
+		".*",
+		"*.rt",
+		"*.lock"
+	],
+	"folder_exclude_patterns":
+	[
+		".*",
+		"__pycache__"	
+	],
+}

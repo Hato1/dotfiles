@@ -1,0 +1,4 @@
+Mint-J Theme is the Mint-Y theme without window borders.
+
+Extract, then move Mint-J into ~/.themes
+Select theme with builtin Themes tool.
