@@ -60,13 +60,13 @@ DISABLE_AUTO_TITLE="true"
 # "mm/dd/yyyy"|"dd.mm.yyyy"|"yyyy-mm-dd"
 # or set a custom format using the strftime function format specifications,
 # see 'man strftime' for details.
-HIST_STAMPS="mm/dd/yyyy"
+HIST_STAMPS="%Y/%m/%d %H:%M"
 export HISTFILE=~/.zsh_history
 export HISTSIZE=10000
 export SAVEHIST=10000
 setopt HIST_IGNORE_SPACE
 setopt HIST_IGNORE_ALL_DUPS
-alias hgrep="history -a | grep "
+alias hgrep="history 0 | grep "
 
 # Would you like to use another custom folder than $ZSH/custom?
 # ZSH_CUSTOM=/path/to/new-custom-folder
@@ -113,11 +113,6 @@ alias zln="zmv -L"
 export PATH=/usr/local/cuda/bin${PATH:+:${PATH}}$ 
 export LD_LIBRARY_PATH=/usr/local/cuda/lib64${LD_LIBRARY_PATH:+:${LD_LIBRARY_PATH}}
 
-export LD_LIBRARY_PATH=/hd/tkDNN/build${LD_LIBRARY_PATH:+:${LD_LIBRARY_PATH}}
-
-export PATH="/home/jacob/.local/bin:$PATH"
-export PATH="/home/jacob/bin:$PATH"
-
 ### Aliases ###
 
 # Docker aliases
@@ -134,6 +129,8 @@ alias dris='dri -v $(pwd):/working --gpus=all'
 
 alias dco="docker compose"
 
+alias dps='docker ps --format "table {{.Names}}\t {{.Image}}\t{{.Status}}\t{{.RunningFor}}"'
+
 
 # Misc aliases
 alias open=xdg-open
@@ -144,24 +141,24 @@ alias dps='docker ps --format "table {{.Names}}\t {{.Image}}\t{{.Status}}\t{{.Ru
 alias cron-stop='sudo /etc/init.d/cron stop'
 alias cron-start='sudo /etc/init.d/cron start'
 
-# Is this useful?
-# scenecp () {
-#     find . -name "$1" -exec cp {} /Bande-nere/seeo/fake_proximity/scenes/19700101 --parents ";"
-# }
-
-
-### Auto-webapp launching
-webapp_dir="/home/jacob/Software/webapp"
-launch_backend="cd $webapp_dir/backend; poetry run flask run --host 0.0.0.0"
-launch_backend_v2="cd $webapp_dir/backend; poetry run python -m app_v2 --dev"
-launch_frontend="cd $webapp_dir/frontend/webplayer2; npm run -- ng serve --host 0.0.0.0 --disable-host-check"
-
-webapp-launch() {
-    cd $webapp_dir || exit
-    dco up -d db
-    gnome-terminal --tab -- zsh -ic "title 'Backend V1'; $launch_backend; exec zsh;"
-    gnome-terminal --tab -- zsh -ic "title 'Backend V2'; $launch_backend_v2; exec zsh;"
-    gnome-terminal --tab -- zsh -ic "title 'Frontend'; $launch_frontend; exec zsh;"
+fix-videos() {
+    for file in "$@"; do
+        extension="${file##*.}"
+        if [[ "$extension" == "avi" || "$extension" == "mkv" ]]; then
+            filename=$(basename "$file")
+            echo "Fixing file: $file"
+            ffmpeg -i "$file" -c copy -map 0 -y /tmp/"$filename" && mv -f /tmp/"$filename" "$file"
+        else
+            echo "Ignoring file (not .avi or .mkv): $extension"
+        fi
+    done
 }
 
-alias labelme=/home/jacob/.venvs/opencv/bin/labelme
+dual-video() {
+    mpv --lavfi-complex="[vid1][vid2]hstack[vo]" $1 --external-file=$2
+}
+
+dual-video2() {
+    ffmpeg -i $1 -i $2 -filter_complex "[0:v]scale=640:640,setsar=1[l];[1:v]scale=640:640,setsar=1[r];[l][r]hstack;[0][1]amix" -vsync 0 output.mp4
+}
+
